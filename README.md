@@ -9,7 +9,7 @@
 Se implemtan los siguientes endpoints:
 - **Agregar una nueva ruta**
 
-
+```
     - Método: POST
     - URL: https://two024-tp-entrega-2-kenzogrosvald.onrender.com/rutas
     - Headers: 
@@ -30,11 +30,11 @@ Se implemtan los siguientes endpoints:
             "heladeraIdOrigen": 1,
             "heladeraIdDestino": 2
         }
-
+```
 
 - **Asignar un nuevo traslado a un colaborador**
 
-
+```
     - Método: POST
     - URL: https://two024-tp-entrega-2-kenzogrosvald.onrender.com/traslados
     - Headers: 
@@ -58,11 +58,11 @@ Se implemtan los siguientes endpoints:
             "heladeraIdOrigen": 1,
             "heladeraIdDestino": 2
         }
-
+```
 
 - **Obtener un traslado por su ID**
 
-
+```
     - Método: GET
     - URL: https://two024-tp-entrega-2-kenzogrosvald.onrender.com/traslados/{id}
     - Response code: 200 OK
@@ -76,11 +76,11 @@ Se implemtan los siguientes endpoints:
             "heladeraDestino": 2,
             "colaboradorId": 1
         }
-
+```
 
 - **Modificar el estado de un traslado por su ID**
 
-
+```
     - Método: PATCH
     - URL: https://two024-tp-entrega-2-kenzogrosvald.onrender.com/traslados/{id}
     - Headers: 
@@ -97,3 +97,4 @@ Se implemtan los siguientes endpoints:
             "colaboradorId": 1
         }
     - Response code: 200 OK
+```
