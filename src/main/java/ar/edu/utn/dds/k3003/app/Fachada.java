@@ -1,5 +1,6 @@
 package ar.edu.utn.dds.k3003.app;
 
+import ar.edu.utn.dds.k3003.facades.FachadaColaboradores;
 import ar.edu.utn.dds.k3003.facades.FachadaHeladeras;
 import ar.edu.utn.dds.k3003.facades.FachadaLogistica;
 import ar.edu.utn.dds.k3003.facades.FachadaViandas;
@@ -11,10 +12,12 @@ import ar.edu.utn.dds.k3003.repositories.RutaMapper;
 import ar.edu.utn.dds.k3003.repositories.RutaRepository;
 import ar.edu.utn.dds.k3003.repositories.TrasladoMapper;
 import ar.edu.utn.dds.k3003.repositories.TrasladoRepository;
+import org.mockito.internal.matchers.Null;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Fachada implements FachadaLogistica {
@@ -25,6 +28,7 @@ public class Fachada implements FachadaLogistica {
     private final TrasladoMapper trasladoMapper = new TrasladoMapper();
     private FachadaViandas fachadaViandas;
     private FachadaHeladeras fachadaHeladeras;
+    private FachadaColaboradores fachadaColaboradores;
 
     /*
     * "Un colaborador de transporte establece que puede llevar
@@ -38,12 +42,21 @@ public class Fachada implements FachadaLogistica {
         return rutaMapper.map(ruta_con_id);
     }
 
-    public Ruta buscarRutaXOrigenYDestino(Integer Origen, Integer Destino) throws NoSuchElementException {
+    public Ruta buscarRutaXOrigenYDestino(Integer Origen, Integer Destino, Long colaboradorId) throws NoSuchElementException {
         List<Ruta> rutas = this.rutaRepository.findByHeladeras(Origen, Destino);
+
+        // No hay ninguna ruta
         if (rutas.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("No hay ninguna ruta cargada en el sistema.");
         }
-        return rutas.get(0);
+
+        Ruta ruta = rutas.get(0);
+        // No hay ruta para ese colaborador
+        if (!Objects.equals(ruta.getColaboradorId(), colaboradorId)) {
+            throw new NoSuchElementException("No existe la ruta de heladeraOrigen " + Origen + " hacia heladeraDestino " + Destino + " para el colaborador " + colaboradorId);
+        }
+
+        return ruta;
     }
 
     /*
@@ -68,24 +81,18 @@ public class Fachada implements FachadaLogistica {
     * */
 
     @Override
-    public TrasladoDTO asignarTraslado(TrasladoDTO trasladoDTO) throws TrasladoNoAsignableException {
+    public TrasladoDTO asignarTraslado(TrasladoDTO trasladoDTO) throws TrasladoNoAsignableException, NoSuchElementException {
         Ruta ruta;
 
-        if(trasladoDTO.getQrVianda() == null) {
-            throw new NoSuchElementException("El traslado no es asignable. No se encontró la vianda.");
-        }
+        // Si no se encuentra la vianda, se lanza una excepción NoSuchElementException
+        ViandaDTO vianda = this.fachadaViandas.buscarXQR(trasladoDTO.getQrVianda());
 
-        // Si no se encuentra la ruta, se lanza una excepción
+        // Si no se encuentra la ruta para ese colaborador, se lanza una excepción TrasladoNoAsignableException
         try {
-            // Intento buscar la ruta
-            ruta = buscarRutaXOrigenYDestino(trasladoDTO.getHeladeraOrigen(), trasladoDTO.getHeladeraDestino());
+            ruta = buscarRutaXOrigenYDestino(trasladoDTO.getHeladeraOrigen(), trasladoDTO.getHeladeraDestino(),trasladoDTO.getColaboradorId());
         } catch (NoSuchElementException e) {
-            throw new TrasladoNoAsignableException("El traslado no es asignable. No se encontró la ruta.");
+            throw new TrasladoNoAsignableException(e.getLocalizedMessage());
         }
-
-        // Esto tira NoSuchElementException si no encuentra la vianda
-        // Lo comento porque no funciona el ViandasProxy
-        // ViandaDTO vianda = this.fachadaViandas.buscarXQR(trasladoDTO.getQrVianda());
 
         // Si tanto la ruta como la vianda existen, procedo a crear y guardar el traslado
         Traslado traslado = this.trasladoRepository.save(
@@ -97,7 +104,7 @@ public class Fachada implements FachadaLogistica {
                 )
         );
 
-        // Crea un DTO con la información del traslado
+        // Creo un DTO con la información del traslado
         TrasladoDTO traslado_dto = new TrasladoDTO(
                 traslado.getQrVianda(),
                 traslado.getEstado(),
@@ -155,7 +162,6 @@ public class Fachada implements FachadaLogistica {
         // Modifico los estados de la vianda y el traslado. Desprecio los retornos
         fachadaViandas.modificarEstado(vianda.getCodigoQR(), EstadoViandaEnum.EN_TRASLADO);
         this.trasladoRepository.modificarEstado(traslado.getId(), EstadoTrasladoEnum.EN_VIAJE);
-
     }
 
     /*

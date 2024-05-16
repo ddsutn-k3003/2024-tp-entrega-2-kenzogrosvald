@@ -5,7 +5,10 @@ import ar.edu.utn.dds.k3003.facades.FachadaViandas;
 import ar.edu.utn.dds.k3003.facades.dtos.EstadoViandaEnum;
 import ar.edu.utn.dds.k3003.facades.dtos.ViandaDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import lombok.SneakyThrows;
 import retrofit2.Response;
@@ -37,9 +40,10 @@ public class ViandasProxy implements FachadaViandas {
     }
 
     @Override
-    public ViandaDTO modificarEstado(String s, EstadoViandaEnum estadoViandaEnum)
-            throws NoSuchElementException {
-        return null;
+    public ViandaDTO modificarEstado(String QR, EstadoViandaEnum estadoViandaEnum) {
+        ViandaDTO vianda = this.buscarXQR(QR);
+        vianda.setEstado(estadoViandaEnum);
+        return vianda;
     }
 
     @Override
@@ -51,15 +55,23 @@ public class ViandasProxy implements FachadaViandas {
     @SneakyThrows
     @Override
     public ViandaDTO buscarXQR(String qr) throws NoSuchElementException {
-        Response<ViandaDTO> execute = service.get(qr).execute();
 
+        Response<ViandaDTO> execute = service.get(qr).execute();
         if (execute.isSuccessful()) {
             return execute.body();
         }
         if (execute.code() == HttpStatus.NOT_FOUND.getCode()) {
-            throw new NoSuchElementException("no se encontro la vianda " + qr);
+            throw new NoSuchElementException("No se encontro la vianda " + qr);
         }
         throw new RuntimeException("Error conectandose con el componente viandas");
+
+        /*
+        if(!qr.equals("unQRQueExiste")){
+            throw new NoSuchElementException("No se encontro la vianda " + qr);
+        }
+
+        return new ViandaDTO("string", LocalDateTime.now(), EstadoViandaEnum.PREPARADA,1L,1);
+         */
     }
 
     @Override

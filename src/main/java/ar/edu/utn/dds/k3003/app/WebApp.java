@@ -1,5 +1,6 @@
 package ar.edu.utn.dds.k3003.app;
 
+import ar.edu.utn.dds.k3003.clients.HeladerasProxy;
 import ar.edu.utn.dds.k3003.clients.ViandasProxy;
 import ar.edu.utn.dds.k3003.controller.RutaController;
 import ar.edu.utn.dds.k3003.controller.TrasladoController;
@@ -18,18 +19,31 @@ public class WebApp {
     public static void main(String[] args) {
 
         var env = System.getenv();
+
+        // Variables de entorno
+        var URL_VIANDAS = env.get("URL_VIANDAS");
+        var URL_LOGISTICA = env.get("URL_LOGISTICA");
+        var URL_HELADERAS = env.get("URL_HELADERAS");
+        var URL_COLABORADORES = env.get("URL_COLABORADORES");
+
         var objectMapper = createObjectMapper();
         var fachada = new Fachada();
 
-        // El ViandasProxy no funciona porque no levanta el localhost:8081
-       fachada.setViandasProxy(new ViandasProxy(objectMapper));
-
+        // Obtengo el puerto de la variable de entorno, si no existe, uso el 8080
         var port = Integer.parseInt(env.getOrDefault("PORT", "8080"));
-        var app = Javalin.create().start(port);
 
+        fachada.setViandasProxy(new ViandasProxy(objectMapper));
+        fachada.setHeladerasProxy(new HeladerasProxy(objectMapper));
         var rutaController = new RutaController(fachada);
         var trasladosController = new TrasladoController(fachada);
 
+
+        var app = Javalin.create().start(port);
+
+        // Home
+        app.get("/", ctx -> ctx.result("Pagina no accesible directamente. Acceder a /rutas, /traslados/{id} o /traslados/{id} con metodo PATCH para modificar."));
+
+        // APIs
         app.post("/rutas", rutaController::agregar);
         app.post("/traslados", trasladosController::asignar);
         app.get("/traslados/{id}", trasladosController::obtener);
