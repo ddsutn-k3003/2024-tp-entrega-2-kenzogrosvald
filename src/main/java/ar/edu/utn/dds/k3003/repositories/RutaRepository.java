@@ -1,10 +1,14 @@
 package ar.edu.utn.dds.k3003.repositories;
 
 import ar.edu.utn.dds.k3003.model.Ruta;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Setter
+@Getter
 public class RutaRepository {
 
     private static AtomicLong seqId = new AtomicLong();
