@@ -81,8 +81,8 @@ Se implemtan los siguientes endpoints:
 - **Modificar el estado de un traslado por su ID**
 
 
-    - Método: POST
-    - URL: https://two024-tp-entrega-2-kenzogrosvald.onrender.com/traslados
+    - Método: PATCH
+    - URL: https://two024-tp-entrega-2-kenzogrosvald.onrender.com/traslados/{id}
     - Headers: 
         {
             "Content-Type": "application/json"
