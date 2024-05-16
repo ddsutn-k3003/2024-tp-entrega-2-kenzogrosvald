@@ -55,7 +55,10 @@ public class Fachada implements FachadaLogistica {
     @Override
     public TrasladoDTO buscarXId(Long idTraslado) throws NoSuchElementException {
         Traslado traslado = this.trasladoRepository.findById(idTraslado);
-        return new TrasladoDTO(traslado.getQrVianda(), traslado.getEstado(), traslado.getFechaTraslado(), traslado.getRuta().getHeladeraIdOrigen(), traslado.getRuta().getHeladeraIdDestino());
+        TrasladoDTO trasladoDTO= new TrasladoDTO(traslado.getQrVianda(), traslado.getEstado(), traslado.getFechaTraslado(), traslado.getRuta().getHeladeraIdOrigen(), traslado.getRuta().getHeladeraIdDestino());
+        trasladoDTO.setColaboradorId(traslado.getRuta().getColaboradorId());
+        trasladoDTO.setId(traslado.getId());
+        return trasladoDTO;
     }
 
     /*
@@ -69,7 +72,7 @@ public class Fachada implements FachadaLogistica {
         Ruta ruta;
 
         if(trasladoDTO.getQrVianda() == null) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("El traslado no es asignable. No se encontró la vianda.");
         }
 
         // Si no se encuentra la ruta, se lanza una excepción
@@ -77,11 +80,12 @@ public class Fachada implements FachadaLogistica {
             // Intento buscar la ruta
             ruta = buscarRutaXOrigenYDestino(trasladoDTO.getHeladeraOrigen(), trasladoDTO.getHeladeraDestino());
         } catch (NoSuchElementException e) {
-            throw new TrasladoNoAsignableException();
+            throw new TrasladoNoAsignableException("El traslado no es asignable. No se encontró la ruta.");
         }
 
         // Esto tira NoSuchElementException si no encuentra la vianda
-        ViandaDTO vianda = this.fachadaViandas.buscarXQR(trasladoDTO.getQrVianda());
+        // Lo comento porque no funciona el ViandasProxy
+        // ViandaDTO vianda = this.fachadaViandas.buscarXQR(trasladoDTO.getQrVianda());
 
         // Si tanto la ruta como la vianda existen, procedo a crear y guardar el traslado
         Traslado traslado = this.trasladoRepository.save(
