@@ -44,6 +44,7 @@ public class TrasladoController {
         var id = context.pathParamAsClass("id", Long.class).get();
         try {
             TrasladoDTO trasladoDTO = context.bodyAsClass(TrasladoDTO.class);
+            trasladoDTO.setId(id);
             String estado = trasladoDTO.getStatus().toString();
 
             // Reviso que sea un estado valido, sino devuelvo un error
