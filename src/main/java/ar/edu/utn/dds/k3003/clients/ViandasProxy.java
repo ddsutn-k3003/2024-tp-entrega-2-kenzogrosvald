@@ -56,6 +56,7 @@ public class ViandasProxy implements FachadaViandas {
     @Override
     public ViandaDTO buscarXQR(String qr) throws NoSuchElementException {
 
+        /* Funciona prendiendo el servidor de Viandas Localmente
         Response<ViandaDTO> execute = service.get(qr).execute();
         if (execute.isSuccessful()) {
             return execute.body();
@@ -64,14 +65,14 @@ public class ViandasProxy implements FachadaViandas {
             throw new NoSuchElementException("No se encontro la vianda " + qr);
         }
         throw new RuntimeException("Error conectandose con el componente viandas");
+        */
 
-        /*
         if(!qr.equals("unQRQueExiste")){
             throw new NoSuchElementException("No se encontro la vianda " + qr);
         }
 
-        return new ViandaDTO("string", LocalDateTime.now(), EstadoViandaEnum.PREPARADA,1L,1);
-         */
+        return new ViandaDTO("unQRQueExiste", LocalDateTime.now(), EstadoViandaEnum.PREPARADA,1L,1);
+
     }
 
     @Override
