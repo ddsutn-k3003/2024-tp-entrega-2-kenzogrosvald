@@ -48,7 +48,6 @@ Se implemtan los siguientes endpoints:
             "fechaTraslado": "2024-05-15T21:10:40Z",
             "heladeraOrigen": 1,
             "heladeraDestino": 2,
-            "colaboradorId": 2
         }
     - Response code: 201 Created
     - Response body:
