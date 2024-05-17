@@ -47,7 +47,7 @@ public class TrasladoController {
             trasladoDTO.setId(id);
             String estado = trasladoDTO.getStatus().toString();
 
-            // Reviso que sea un estado valido, sino devuelvo un error
+            // Reviso que sea un estado valido, sino devuelvo una excepcion
             switch (estado) {
                 case "EN_VIAJE":
                     this.fachada.trasladoRetirado(id);
@@ -56,9 +56,8 @@ public class TrasladoController {
                     this.fachada.trasladoDepositado(id);
                     break;
                 default:
-                    context.result("Solo se puede cambiar el estado a EN_VIAJE y ENTREGADO.");
+                    context.result("Solo se puede cambiar el estado de un traslado a EN_VIAJE o ENTREGADO.");
                     context.status(HttpStatus.BAD_REQUEST);
-                    return;
             }
         }
         catch(NoSuchElementException ex) {

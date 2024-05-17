@@ -52,9 +52,9 @@ public class FachadaLogisticaTest {
         Integer destino = 2;
 
         fachada.agregar(new RutaDTO(1L, 1, 2));
-        Ruta result = fachada.buscarRutaXOrigenYDestino(origen, destino, 1L);
+        Ruta result = fachada.buscarRutaXOrigenYDestino(origen, destino);
 
-        Assertions.assertNotNull(result, "La ruta no es nula porque agregue una ruta para ese origen y destino, que tiene un colaborador asignado.");
+        Assertions.assertNotNull(result, "La ruta no es nula porque agregue una ruta para ese origen y destino.");
     }
 
     @Test

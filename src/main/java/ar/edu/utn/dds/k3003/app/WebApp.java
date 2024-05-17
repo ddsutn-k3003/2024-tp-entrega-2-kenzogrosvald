@@ -41,7 +41,7 @@ public class WebApp {
         var app = Javalin.create().start(port);
 
         // Home
-        app.get("/", ctx -> ctx.result("Pagina no accesible directamente. Acceder a /rutas, /traslados/{id} o /traslados/{id} con metodo PATCH para modificar."));
+        app.get("/", ctx -> ctx.result("Módulo Logística - Diseño de Sistemas K3003 - UTN FRBA."));
 
         // APIs
         app.post("/rutas", rutaController::agregar);

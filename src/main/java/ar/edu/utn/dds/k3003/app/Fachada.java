@@ -42,20 +42,19 @@ public class Fachada implements FachadaLogistica {
         return rutaMapper.map(ruta_con_id);
     }
 
-    public Ruta buscarRutaXOrigenYDestino(Integer Origen, Integer Destino, Long colaboradorId) throws NoSuchElementException {
+    public Ruta buscarRutaXOrigenYDestino(Integer Origen, Integer Destino) throws NoSuchElementException {
         List<Ruta> rutas = this.rutaRepository.findByHeladeras(Origen, Destino);
 
         // No hay ninguna ruta
         if (rutas.isEmpty()) {
-            throw new NoSuchElementException("No hay ninguna ruta cargada en el sistema.");
+            throw new NoSuchElementException("No hay ninguna ruta cargada en el sistema aun.");
         }
 
-        Ruta ruta = rutas.get(0);
-        // No hay ruta para ese colaborador
-        if (!Objects.equals(ruta.getColaboradorId(), colaboradorId)) {
-            throw new NoSuchElementException("No existe la ruta de heladeraOrigen " + Origen + " hacia heladeraDestino " + Destino + " para el colaborador " + colaboradorId);
-        }
-
+        // Busco una ruta con el mismo origen y destino
+        Ruta ruta = rutas.stream()
+                .filter(r -> Objects.equals(r.getHeladeraIdOrigen(), Origen) && Objects.equals(r.getHeladeraIdDestino(), Destino))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("No existe la ruta de heladeraOrigen " + Origen + " hacia heladeraDestino " + Destino));
         return ruta;
     }
 
@@ -87,9 +86,9 @@ public class Fachada implements FachadaLogistica {
         // Si no se encuentra la vianda, se lanza una excepción NoSuchElementException
         ViandaDTO vianda = this.fachadaViandas.buscarXQR(trasladoDTO.getQrVianda());
 
-        // Si no se encuentra la ruta para ese colaborador, se lanza una excepción TrasladoNoAsignableException
+        // Si no se encuentra una ruta para ese origen y destino, se lanza una excepción TrasladoNoAsignableException
         try {
-            ruta = buscarRutaXOrigenYDestino(trasladoDTO.getHeladeraOrigen(), trasladoDTO.getHeladeraDestino(),trasladoDTO.getColaboradorId());
+            ruta = buscarRutaXOrigenYDestino(trasladoDTO.getHeladeraOrigen(), trasladoDTO.getHeladeraDestino());
         } catch (NoSuchElementException e) {
             throw new TrasladoNoAsignableException(e.getLocalizedMessage());
         }
