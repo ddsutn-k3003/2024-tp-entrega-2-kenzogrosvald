@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Fachada implements FachadaLogistica {
@@ -36,26 +37,31 @@ public class Fachada implements FachadaLogistica {
     * */
 
     @Override
-    public RutaDTO agregar(RutaDTO rutaDTO) {
-        Ruta ruta_sin_id = new Ruta(rutaDTO.getColaboradorId(), rutaDTO.getHeladeraIdOrigen(), rutaDTO.getHeladeraIdDestino());
-        Ruta ruta_con_id = this.rutaRepository.save(ruta_sin_id);
-        return rutaMapper.map(ruta_con_id);
+    public RutaDTO agregar(RutaDTO rutaDTO) throws NoSuchElementException{
+        try {
+            Ruta ruta_sin_id = new Ruta(rutaDTO.getColaboradorId(), rutaDTO.getHeladeraIdOrigen(), rutaDTO.getHeladeraIdDestino());
+            Ruta ruta_con_id = this.rutaRepository.save(ruta_sin_id);
+            return rutaMapper.map(ruta_con_id);
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException(e.getLocalizedMessage());
+        }
     }
 
     public Ruta buscarRutaXOrigenYDestino(Integer Origen, Integer Destino) throws NoSuchElementException {
         List<Ruta> rutas = this.rutaRepository.findByHeladeras(Origen, Destino);
 
-        // No hay ninguna ruta
         if (rutas.isEmpty()) {
-            throw new NoSuchElementException("No hay ninguna ruta cargada en el sistema aun.");
+            throw new NoSuchElementException("No hay ninguna ruta cargada para la heladeraOrigen " + Origen + " hacia la heladeraDestino " + Destino);
         }
 
-        // Busco una ruta con el mismo origen y destino
-        Ruta ruta = rutas.stream()
-                .filter(r -> Objects.equals(r.getHeladeraIdOrigen(), Origen) && Objects.equals(r.getHeladeraIdDestino(), Destino))
-                .findAny()
-                .orElseThrow(() -> new NoSuchElementException("No existe la ruta de heladeraOrigen " + Origen + " hacia heladeraDestino " + Destino));
-        return ruta;
+        if (rutas.size() > 1) {
+            // Selecciono una ruta al azar de las disponibles
+            Random rand = new Random();
+            return rutas.get(rand.nextInt(rutas.size()));
+        }
+
+        // Si solo hay una ruta, la devuelvo
+        return rutas.get(0);
     }
 
     /*

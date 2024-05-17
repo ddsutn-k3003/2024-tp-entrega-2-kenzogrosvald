@@ -18,7 +18,8 @@ public class RutaRepository {
         this.rutas = new ArrayList<>();
     }
 
-    public Ruta save(Ruta ruta) {
+    public Ruta save(Ruta ruta) throws NoSuchElementException {
+
         if (Objects.isNull(ruta.getId())) {
             ruta.setId(seqId.getAndIncrement());
             this.rutas.add(ruta);
@@ -29,7 +30,7 @@ public class RutaRepository {
     public Ruta findById(Long id) {
         Optional<Ruta> first = this.rutas.stream().filter(x -> x.getId().equals(id)).findFirst();
         return first.orElseThrow(() -> new NoSuchElementException(
-                String.format("No hay una ruta de id: %s", id)
+                String.format("No hay una ruta de id %s", id)
         ));
     }
 
