@@ -97,3 +97,10 @@ Se implemtan los siguientes endpoints:
         }
     - Response code: 200 OK
 ```
+<hr>
+
+<div id="footer" align="center">
+  <a href="https://www.frba.utn.edu.ar/">
+  <img src="https://github.com/ddsutn-k3003/2024-tp-entrega-2-kenzogrosvald/assets/94919997/f35d82b8-fd1a-435a-b1d9-3aad2785b732" style="width:70%; height:auto;">
+  </a>
+</div>
